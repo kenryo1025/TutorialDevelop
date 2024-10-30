@@ -51,14 +51,22 @@ public class UserController {
 
     /**User更新画面の表示**/
     @GetMapping("/update/{id}/")
-    public String getUser(@PathVariable("id") Integer id, Model model) {
-        model.addAttribute("user",service.getUser(id));
+    public String getUser(@ModelAttribute User user,@PathVariable(value = "id", required = false) Integer id, Model model) {
+        if (id != null) {
+            model.addAttribute("user", service.getUser(id));
+        } else {
+            model.addAttribute("user", user);
+        }
         return "user/update";
-    }
+        }
+
 
     /**User更新処理**/
     @PostMapping("/update/{id}/")
-    public String postUser(User user) {
+    public String postUser(@PathVariable("id") Integer id,@Validated User user,BindingResult res, Model model) {
+        if(res.hasErrors()) {
+            return getUser(user, null, model);
+            }
         service.saveUser(user);
         return "redirect:/user/list";
     }
@@ -68,5 +76,7 @@ public class UserController {
         service.deleteUser(idck);
         return "redirect:/user/list";
     }
+
+
 
 }
